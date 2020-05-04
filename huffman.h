@@ -12,7 +12,9 @@ typedef struct ListNode {
 
 TreeNode *createTreeNode(double);
 ListNode *createListNode(double);
+ListNode *getList(int);
 ListNode *insertListNode(ListNode *, ListNode *);
 void freeTree(TreeNode *);
 TreeNode *mergeTree(TreeNode *, TreeNode *);
 void printCodes(TreeNode *, char *);
+void checkOptions(int, char **);

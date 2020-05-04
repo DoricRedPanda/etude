@@ -4,8 +4,12 @@
 #include <err.h>
 #include "huffman.h"
 
-ListNode *createListNode(double item) {
+int dflag;
+
+ListNode *createListNode(double item)
+{
 	ListNode *node;
+
 	if ((node = malloc(sizeof(ListNode))) < 0) {
 		err(1, "malloc failure");
 		exit(EXIT_FAILURE);
@@ -15,8 +19,10 @@ ListNode *createListNode(double item) {
 	return node;
 }
 
-TreeNode *createTreeNode(double item) {
+TreeNode *createTreeNode(double item)
+{
 	TreeNode *node;
+
 	if ((node = malloc(sizeof(TreeNode))) < 0) {
 		err(1, "malloc failure");
 		exit(EXIT_FAILURE);
@@ -27,14 +33,15 @@ TreeNode *createTreeNode(double item) {
 	return node;
 }
 
-ListNode *insertListNode(ListNode *list, ListNode *new) {
+ListNode *insertListNode(ListNode *list, ListNode *new)
+{
 	ListNode *prev, *cur;
 	double item = new->item->item;
 
 	if (list == NULL)
 		return new;
 	for (prev = cur = list; cur != NULL; prev = cur, cur = cur->next) {
-		if (item < cur->item->item) {
+		if (item <= cur->item->item) {
 			if (cur == prev)
 				list = new;
 			else
@@ -50,7 +57,8 @@ ListNode *insertListNode(ListNode *list, ListNode *new) {
 	return list;
 }
 
-TreeNode *mergeTree(TreeNode *l, TreeNode *r) {
+TreeNode *mergeTree(TreeNode *l, TreeNode *r)
+{
 	TreeNode *node;
 
 	node = createTreeNode(l->item + r->item);
@@ -64,7 +72,10 @@ void printCodes(TreeNode *node, char *s)
 	if (node->left == NULL) {
 		if (strlen(s) == 0)
 			strcat(s, "1");
-		printf("%s\t%lf\n", s, node->item);
+		if (dflag)
+			printf("%s\t%lf\n", s, node->item);
+		else
+			printf("%s\n", s);
 		return;
 	}
 	printCodes(node->left, strcat(s, "0"));
@@ -73,7 +84,8 @@ void printCodes(TreeNode *node, char *s)
 	s[strlen(s)-1] = 0;
 }
 
-void freeTree(TreeNode * node) {
+void freeTree(TreeNode *node)
+{
 	if (node == NULL)
 		return;
 	freeTree(node->left);
@@ -81,23 +93,69 @@ void freeTree(TreeNode * node) {
 	free(node);
 }
 
-int main(void)
+ListNode *getList(int num)
 {
-	ListNode *list = NULL, *tmpList, *mergedList;
-	TreeNode *tmpTree;
-	char *string;
-	double val;
-	int num;
+	ListNode *list = NULL;
+	double val, total = 0.0;
 
-	scanf("%d", &num);
 	if (num <= 0) {
-		errx(1, "%d <= 0", num);
+		errx(1, "%d <= 0, Wrong input", num);
 		exit(EXIT_FAILURE);
 	}
 	for (int i = 0; i < num; i++) {
-		scanf("%lf", &val);
+		if (scanf("%lf", &val) <= 0) {
+			errx(1, "scanf failure");
+			exit(EXIT_FAILURE);
+		}
+		if (val <= 0.0) {
+			errx(1, "%lf <= 0, Wrong input", val);
+			exit(EXIT_FAILURE);
+		}
+		total += val;
 		list = insertListNode(list, createListNode(val));
 	}
+	if (total > 1.0) {
+		errx(1, "%lf > 1: Wrong sum of probabilities", total);
+		exit(EXIT_FAILURE);
+	}
+	return list;
+}
+
+void checkOptions(int argc, char *argv[])
+{
+	if (argc == 1)
+		return;
+	if (argc == 2) {
+		if (!strcmp(*(++argv), "-d")) {
+			dflag = 1;
+			return;
+		} else if (!strcmp(*argv, "-h")) {
+			puts("Usage: huffman [OPTION]");
+			puts("Enter number n, then n doubles");
+			puts("Options:");
+			puts("  -h\t To display this message");
+			puts("  -d\t Verbose output");
+			exit(EXIT_SUCCESS);
+		}
+	}
+	errx(1, "Wrong usage.\nTry 'huffman -h' for more information.");
+	exit(EXIT_FAILURE);
+}
+
+int main(int argc, char *argv[])
+{
+	ListNode *list, *tmpList, *mergedList;
+	TreeNode *tmpTree;
+	char *string;
+	int num;
+
+	checkOptions(argc, argv);
+
+	if (scanf("%d", &num) <= 0) {
+		errx(1, "scanf failure");
+		exit(EXIT_FAILURE);
+	}
+	list = getList(num);
 	while (list->next != NULL) {
 		tmpTree = mergeTree(list->item, list->next->item);
 		tmpList = list;
