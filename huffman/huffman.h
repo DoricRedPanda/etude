@@ -1,7 +1,8 @@
 typedef struct TreeNode {
-	double item;
 	struct TreeNode *left;
 	struct TreeNode *right;
+	long double item;
+	int key;
 } TreeNode;
 
 typedef struct ListNode {
@@ -10,8 +11,8 @@ typedef struct ListNode {
 
 } ListNode;
 
-TreeNode *createTreeNode(double);
-ListNode *createListNode(double);
+TreeNode *createTreeNode(long double);
+ListNode *createListNode(long double, int);
 ListNode *getList(int);
 ListNode *insertListNode(ListNode *, ListNode *);
 void freeTree(TreeNode *);

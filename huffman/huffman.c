@@ -4,9 +4,9 @@
 #include <err.h>
 #include "huffman.h"
 
-int dflag;
+int vflag;
 
-ListNode *createListNode(double item)
+ListNode *createListNode(long double item, int key)
 {
 	ListNode *node;
 
@@ -15,11 +15,12 @@ ListNode *createListNode(double item)
 		exit(EXIT_FAILURE);
 	}
 	node->item = createTreeNode(item);
+	node->item->key = key;
 	node->next = NULL;
 	return node;
 }
 
-TreeNode *createTreeNode(double item)
+TreeNode *createTreeNode(long double item)
 {
 	TreeNode *node;
 
@@ -36,7 +37,7 @@ TreeNode *createTreeNode(double item)
 ListNode *insertListNode(ListNode *list, ListNode *new)
 {
 	ListNode *prev, *cur;
-	double item = new->item->item;
+	long double item = new->item->item;
 
 	if (list == NULL)
 		return new;
@@ -72,10 +73,10 @@ void printCodes(TreeNode *node, char *s)
 	if (node->left == NULL) {
 		if (strlen(s) == 0)
 			strcat(s, "1");
-		if (dflag)
-			printf("%s\t%lf\n", s, node->item);
+		if (vflag)
+			printf("%d\t%0.17Lf\t%s\n", node->key, node->item, s);
 		else
-			printf("%s\n", s);
+			printf("%c%s\n", node->key, s);
 		return;
 	}
 	printCodes(node->left, strcat(s, "0"));
@@ -96,26 +97,27 @@ void freeTree(TreeNode *node)
 ListNode *getList(int num)
 {
 	ListNode *list = NULL;
-	double val, total = 0.0;
+	long double val, total = 0.0;
+	int key;
 
 	if (num <= 0) {
 		errx(1, "%d <= 0, Wrong input", num);
 		exit(EXIT_FAILURE);
 	}
 	for (int i = 0; i < num; i++) {
-		if (scanf("%lf", &val) <= 0) {
+		if (scanf("%Lf %d", &val, &key) <= 1) {
 			errx(1, "scanf failure");
 			exit(EXIT_FAILURE);
 		}
 		if (val <= 0.0) {
-			errx(1, "%lf <= 0, Wrong input", val);
+			errx(1, "%Lf <= 0, Wrong input", val);
 			exit(EXIT_FAILURE);
 		}
 		total += val;
-		list = insertListNode(list, createListNode(val));
+		list = insertListNode(list, createListNode(val, key));
 	}
-	if (total > 1.0) {
-		errx(1, "%lf > 1: Wrong sum of probabilities", total);
+	if (total > 1) {
+		errx(1, "%Lf > 1: Wrong sum of probabilities", total);
 		exit(EXIT_FAILURE);
 	}
 	return list;
@@ -126,15 +128,15 @@ void checkOptions(int argc, char *argv[])
 	if (argc == 1)
 		return;
 	if (argc == 2) {
-		if (!strcmp(*(++argv), "-d")) {
-			dflag = 1;
+		if (!strcmp(*(++argv), "-v")) {
+			vflag = 1;
 			return;
 		} else if (!strcmp(*argv, "-h")) {
 			puts("Usage: huffman [OPTION]");
-			puts("Enter number n, then n doubles");
+			puts("Enter number n, then n floating-point numbers and key codes");
 			puts("Options:");
 			puts("  -h\t To display this message");
-			puts("  -d\t Verbose output");
+			puts("  -v\t Verbose output");
 			exit(EXIT_SUCCESS);
 		}
 	}
@@ -169,6 +171,8 @@ int main(int argc, char *argv[])
 		err(1, "calloc failure");
 		exit(EXIT_FAILURE);
 	}
+	if (vflag)
+		puts("key\tcode\tprobability");
 	printCodes(list->item, string);
 	free(string);
 	freeTree(list->item);
