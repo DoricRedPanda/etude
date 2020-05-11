@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-	char code[256][MAXCODELEN + 2] = {0};
+	char code[256][MAXCODELEN + 2] = {{0}};
 	FILE *fp;
 	int ch;
 
@@ -28,5 +28,6 @@ int main(int argc, char *argv[])
 	while ((ch = getchar()) != '.' && ch != EOF) {
 		fputs(code[ch], stdout);
 	}
+	putchar('\n');
 	return 0;
 }

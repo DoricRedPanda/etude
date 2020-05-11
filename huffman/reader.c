@@ -30,11 +30,11 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < 256; i++)
 		if (count[i] != 0)
 			++uniq;
-	printf("%d\n", uniq);
 	if (len == 0) {
 		errx(1, "unsigned long long overflow");
 		exit(EXIT_FAILURE);
 	}
+	printf("%d\n", uniq);
 	for (int i = 0; i < 256; i++) {
 		if (count[i])
 			printf("%0.17Lf %d\n", (long double) count[i] / len, i);

@@ -133,7 +133,8 @@ void checkOptions(int argc, char *argv[])
 			return;
 		} else if (!strcmp(*argv, "-h")) {
 			puts("Usage: huffman [OPTION]");
-			puts("Enter number n, then n floating-point numbers and key codes");
+			puts("Enter number n,");
+			puts("then n floating-point numbers and key codes.");
 			puts("Options:");
 			puts("  -h\t To display this message");
 			puts("  -v\t Verbose output");
@@ -174,6 +175,7 @@ int main(int argc, char *argv[])
 	if (vflag)
 		puts("key\tcode\tprobability");
 	printCodes(list->item, string);
+	putchar('\n');
 	free(string);
 	freeTree(list->item);
 	free(list);
