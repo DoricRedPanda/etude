@@ -10,7 +10,7 @@ ListNode *createListNode(long double item, int key)
 {
 	ListNode *node;
 
-	if ((node = malloc(sizeof(ListNode))) < 0) {
+	if ((node = malloc(sizeof(ListNode))) == NULL) {
 		err(1, "malloc failure");
 		exit(EXIT_FAILURE);
 	}
@@ -24,7 +24,7 @@ TreeNode *createTreeNode(long double item)
 {
 	TreeNode *node;
 
-	if ((node = malloc(sizeof(TreeNode))) < 0) {
+	if ((node = malloc(sizeof(TreeNode))) == NULL) {
 		err(1, "malloc failure");
 		exit(EXIT_FAILURE);
 	}
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 		free(tmpList);
 		list = insertListNode(list, mergedList);
 	}
-	if ((string = calloc(num, sizeof(char))) < 0) {
+	if ((string = calloc(num, sizeof(char))) == NULL) {
 		err(1, "calloc failure");
 		exit(EXIT_FAILURE);
 	}
